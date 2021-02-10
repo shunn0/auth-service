@@ -12,7 +12,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.session.SessionManagementFilter;
+import org.springframework.web.cors.CorsUtils;
 
+import com.autho.authservice.filter.CorsFilter;
 import com.autho.authservice.filter.JWTokenFilter;
 import com.autho.authservice.services.AuserDetailsService;
 
@@ -30,21 +33,20 @@ public class Configurer extends WebSecurityConfigurerAdapter {
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService);
 		auth.jdbcAuthentication().passwordEncoder(passwordEncoder());
-		// auth.jdbcAuthentication().passwordEncoder(new BCryptPasswordEncoder());
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.cors().and().csrf().disable().authorizeRequests()
-				// .antMatchers("/admin").hasRole("ADMIN")
-				// .antMatchers("/user").hasAnyRole("ADMIN", "USER")
-				.antMatchers("/api/all").permitAll().antMatchers("/api/login").permitAll().antMatchers("/api/signup")
-				.permitAll()
-				// .and().formLogin();
-				.anyRequest().authenticated().and().exceptionHandling().and().sessionManagement()
+		http.csrf().disable().authorizeRequests()
+				.requestMatchers(CorsUtils::isCorsRequest).permitAll()
+				.antMatchers("/api/all").permitAll()
+				.antMatchers("/api/login").permitAll().antMatchers("/api/signup").permitAll().anyRequest()
+				.authenticated().and().exceptionHandling().and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		http.logout().invalidateHttpSession(true).logoutUrl("/logout").logoutSuccessUrl("/");
+
 		http.addFilterBefore(jwtokenFilter, UsernamePasswordAuthenticationFilter.class);
-		http.logout();
+		http.addFilterBefore(corsFilter(), SessionManagementFilter.class);
 	}
 
 	@Bean
@@ -57,5 +59,11 @@ public class Configurer extends WebSecurityConfigurerAdapter {
 	@Bean
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
+	}
+
+	@Bean
+	CorsFilter corsFilter() {
+		CorsFilter filter = new CorsFilter();
+		return filter;
 	}
 }

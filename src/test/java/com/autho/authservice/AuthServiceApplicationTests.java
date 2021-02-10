@@ -152,12 +152,12 @@ class AuthServiceApplicationTests {
 	@Test
 	public void testPermission() {
 		List<PermissionResp> perms = permissionDAO.getAllPermissions();
-		assertThat(perms, hasSize(7));
+		assertThat(perms, hasSize(8));
 
 		permissionDAO.createPermission(new CodeDescRequest("NEW_PERM", "new perm"));
 
 		perms = permissionDAO.getAllPermissions();
-		assertThat(perms, hasSize(8));
+		assertThat(perms, hasSize(9));
 
 		List<UserPermissionResp> userPerms = userDAO.varifyUserPermissions(ADMIN_USER_NAME, preparePermissionList());
 		for (UserPermissionResp resp : userPerms) {

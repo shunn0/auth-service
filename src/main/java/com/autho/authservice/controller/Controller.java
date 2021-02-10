@@ -35,7 +35,6 @@ import com.autho.authservice.repo.RoleDAO;
 import com.autho.authservice.repo.UserDAO;
 import com.autho.authservice.utils.TokenManager;
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
 public class Controller {
@@ -52,11 +51,12 @@ public class Controller {
 	@Autowired
 	TokenManager tokenManager;
 
-	@CrossOrigin(origins = "*", allowedHeaders = "*")
+
 	@GetMapping("/api/all")
 	public String home() {
 		return "Welcome";
 	}
+
 
 	@PostMapping("/api/login")
 	public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) throws Exception {
